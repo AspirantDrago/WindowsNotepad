@@ -67,5 +67,61 @@ namespace WindowsNotepad
                 scale -= STEP_SCALE;
             }
         }
+
+        private void cutToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            textBox.Cut();
+        }
+
+        private void copyToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            textBox.Copy();
+        }
+
+        private void pasteToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            textBox.Paste();
+        }
+
+        private void deleteToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            int n = textBox.SelectionLength;
+            int pos = textBox.SelectionStart;
+            if (n == 0)
+            {
+                return;
+            }
+            textBox.Text = textBox.Text.Remove(pos, n);
+            textBox.SelectionStart = pos;
+            textBox.ScrollToCaret();
+        }
+
+        private void cancelToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            textBox.Undo();
+        }
+
+        private void selectAllToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            textBox.SelectAll();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            Save();
+        }
+
+        private void saveAsКакToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            SaveAs();
+        }
+
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!CloseDocument())
+            {
+                e.Cancel = true;
+            }
+        }
     }
 }

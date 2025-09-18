@@ -7,6 +7,7 @@ namespace WindowsNotepad
     {
         private string _filename;
         private bool _isModified = false;
+        private bool _isSaved = false;
         private int _scale = 100;
 
         private const int MIN_SCALE = 10;
@@ -83,6 +84,7 @@ namespace WindowsNotepad
             filename = "";
             textBox.Clear();
             isModified = false;
+            _isSaved = false;
         }
 
         /// <summary>
@@ -122,10 +124,69 @@ namespace WindowsNotepad
             }
         }
 
-        public bool Save()
+        public bool Save(bool checkIsSaved = true)
         {
-            // TODO
-            return true;
+            if (!_isSaved && checkIsSaved)
+            {
+                return SaveAs();
+            }
+
+            TextWriter writer = null;
+            try
+            {
+                writer = new StreamWriter(filename);
+                writer.Write(textBox.Text);
+                _isSaved = true;
+                isModified = false;
+                return true;
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                ShowError($"Ошибка доступа при сохранении файла \"{filename}\"");
+                return false;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                ShowError($"Путь \"{filename}\" не существует");
+                return false;
+            }
+            catch (PathTooLongException)
+            {
+                ShowError($"Слишком длинное имя файла \"{filename}\"");
+                return false;
+            }
+            catch (IOException)
+            {
+                ShowError($"Ошибка сохранения файла \"{filename}\"");
+                return false;
+            }
+            catch (System.Security.SecurityException)
+            {
+                ShowError($"Ошибка безопасности при сохранении файла \"{filename}\"");
+                return false;
+            }
+            finally
+            {
+                writer?.Close();
+            }
+        }
+
+        public bool SaveAs()
+        {
+            if (_isSaved)
+            {
+                saveFileDialog.FileName = filename;
+            } else
+            {
+                saveFileDialog.FileName = "";
+            }
+            DialogResult r = saveFileDialog.ShowDialog();
+            if (r != DialogResult.OK)
+            {
+                return false;
+            }
+            filename = saveFileDialog.FileName;
+            return Save(checkIsSaved: false);
         }
 
         public void TryOpen()
@@ -151,6 +212,7 @@ namespace WindowsNotepad
                 textBox.Text = reader.ReadToEnd();
                 filename = name;
                 isModified = false;
+                _isSaved = true;
             }
             catch (FileNotFoundException)
             {
