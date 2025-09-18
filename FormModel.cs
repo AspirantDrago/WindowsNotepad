@@ -41,6 +41,28 @@ namespace WindowsNotepad
             }
         }
 
+        public int scale
+        {
+            get
+            {
+                return _scale;
+            }
+            set
+            {
+                if (value < MIN_SCALE || value > MAX_SCALE)
+                {
+                    return;
+                }
+                _scale = value;
+                float fontSize = DEFAULT_FONT * scale / 100f;
+                textBox.Font = new System.Drawing.Font(
+                    textBox.Font.Name,
+                    fontSize
+                );
+                toolStripStatusLabelScale.Text = $"{value}%";
+            }
+        }
+
         public void UpdateTitle()
         {
             if (_isModified)
@@ -150,29 +172,6 @@ namespace WindowsNotepad
                 reader?.Close();
             }
             return true;
-        }
-
-        private void IncScale()
-        {
-            if (_scale > MIN_SCALE)
-            {
-                _scale -= MIN_SCALE;
-                _updateScale();
-            }
-        }
-
-        private void DescScale()
-        {
-            if (_scale < MAX_SCALE)
-            {
-                _scale += MAX_SCALE;
-                _updateScale();
-            }
-        }
-
-        private void _updateScale()
-        {
-            // TODO ?
         }
     }
 }
